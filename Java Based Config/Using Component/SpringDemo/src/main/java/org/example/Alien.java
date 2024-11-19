@@ -13,7 +13,7 @@ public class Alien {
 
     //    @Autowired
     // by default bean name will be class name with first letter small. otherwise we can use custom bean name using  @Component("bean_name")
-//    @Qualifier("desktop")
+//    @Qualifier("desktop"), also qualifier mentions that which bean to use when there is multiple bean with same type.
     private Computer computer;
 
     public Alien() {
