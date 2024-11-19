@@ -1,4 +1,4 @@
-# Spring Ecosystem Overview
+# Spring Overview
 
 ## Core Technologies
 
