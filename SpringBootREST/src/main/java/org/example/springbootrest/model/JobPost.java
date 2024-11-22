@@ -1,7 +1,6 @@
 package org.example.springbootrest.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +19,8 @@ public class JobPost {
     private String postProfile;
     private String postDescription;
     private int requiredExperience;
+//    @ElementCollection
+//    @CollectionTable(name = "job_tech_stack", joinColumns = @JoinColumn(name = "post_id"))
+//    @Column(name = "tech_stack")
     private List<String> postTechStack;
 }

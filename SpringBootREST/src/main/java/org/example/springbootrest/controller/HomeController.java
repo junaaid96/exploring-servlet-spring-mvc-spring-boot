@@ -57,3 +57,4 @@ public class HomeController {
         return jobService.searchJobPosts(keyword);
     }
 }
+

@@ -2,14 +2,21 @@ package org.example.springbootrest.repository;
 
 import org.example.springbootrest.model.JobPost;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface JobRepository extends JpaRepository<JobPost, Integer> {
-    List<JobPost> findByPostProfileContainingOrPostDescriptionContaining(String postProfile, String postDescription);
-
+    @Query("SELECT DISTINCT j FROM JobPost j WHERE " +
+            "LOWER(j.postProfile) LIKE LOWER(concat('%', :postProfile, '%')) OR " +
+            "LOWER(j.postDescription) LIKE LOWER(concat('%', :postDescription, '%'))")
+    List<JobPost> findByPostProfileContainingOrPostDescriptionContaining(
+            @Param("postProfile") String postProfile,
+            @Param("postDescription") String postDescription
+    );
 }
 
 //List<JobPost> jobPosts = new ArrayList<>(Arrays.asList(
