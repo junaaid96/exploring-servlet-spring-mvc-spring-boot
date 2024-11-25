@@ -15,7 +15,6 @@ public class ValidationAspect {
     @Around("execution(* org.example.springaop.service.JobService.getJobPost(..)) && args(postId)")
     public Object validateAndUpdate(ProceedingJoinPoint joinPoint, int postId) throws Throwable {
         if(postId < 0) {
-//            logger.error("Post Id cannot be negative!");
             logger.error("Post Id cannot be negative!");
             postId = -postId;
             logger.info("Post Id converted to positive: " + postId);
