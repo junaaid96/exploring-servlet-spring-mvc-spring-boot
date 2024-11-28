@@ -19,17 +19,17 @@ public class StudentController {
             new Student(3, "Doe", "C++")
     ));
 
-    @GetMapping("/csrf")
+    @GetMapping("csrf")
     public CsrfToken getCrsfToken(HttpServletRequest request) {
         return (CsrfToken) request.getAttribute("_csrf");
     }
 
-    @GetMapping("/students")
+    @GetMapping("students")
     public List<Student> getStudents() {
         return students;
     }
 
-    @PostMapping("/addStudent")
+    @PostMapping("addStudent")
     public void addStudent(@RequestBody Student student) {
         students.add(student);
     }

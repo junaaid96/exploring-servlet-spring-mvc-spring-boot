@@ -1,6 +1,8 @@
 package org.example.springsec.service;
 
 import org.example.springsec.dao.UserRepository;
+import org.example.springsec.model.User;
+import org.example.springsec.model.UserPrinciple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,6 +17,10 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found!");
+        }
+        return new UserPrinciple(user);
     }
 }
