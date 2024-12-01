@@ -1,10 +1,12 @@
 package org.example.springsec.config;
 
+import org.example.springsec.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -18,12 +20,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
+
+    private JwtFilter jwtFilter;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -44,15 +49,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(customizer -> customizer.disable());
-        http.authorizeHttpRequests(request -> request
+        http.csrf(customizer -> customizer.disable())
+                .authorizeHttpRequests(request -> request
                 .requestMatchers("register", "login")
                 .permitAll()
-                 .anyRequest().authenticated());
-        // when session is stateless, then don't need form login.
-        // http.formLogin(Customizer.withDefaults());
-        http.httpBasic(Customizer.withDefaults());
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                 .anyRequest().authenticated())
+                // when session is stateless, then don't need form login.
+                // .formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -75,9 +81,3 @@ public class SecurityConfig {
 //        return new InMemoryUserDetailsManager(user, admin);
 //    }
 }
-
-// more clean way to write the same code
-// http.csrf(customizer -> customizer.disable())
-//        .authorizeHttpRequests(request -> request.anyRequest().authenticated())
-//        .httpBasic(Customizer.withDefaults())
-//        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
