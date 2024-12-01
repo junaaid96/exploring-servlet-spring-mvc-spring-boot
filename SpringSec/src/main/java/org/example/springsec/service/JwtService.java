@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import static io.jsonwebtoken.Jwts.*;
+
 @Service
 public class JwtService {
     // Base64 encoded secret key (not recommended for production - should be in secure config)
@@ -51,7 +53,7 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
 
         // Build the JWT token with claims, subject, timestamps, and signature
-        return Jwts.builder()
+        return builder()
                 .setClaims(claims)                // Set custom claims (empty here)
                 .setSubject(username)             // Set the subject (username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))  // Set issue time
@@ -66,7 +68,7 @@ public class JwtService {
     }
 
     // Extracts username from the JWT token
-    public String extractUserName(String token) {
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -87,7 +89,7 @@ public class JwtService {
 
     // Validates the token by checking username and expiration
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String userName = extractUserName(token);
+        final String userName = extractUsername(token);
         return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 

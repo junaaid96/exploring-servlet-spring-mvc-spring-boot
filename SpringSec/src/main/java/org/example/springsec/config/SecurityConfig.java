@@ -22,62 +22,83 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+// Configuration class for Spring Security settings
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity // Enables Spring Security's web security support
 public class SecurityConfig {
+    // Service to load user-specific data
     @Autowired
     private UserDetailsService userDetailsService;
 
+    // Custom JWT filter for token-based authentication
+    @Autowired
     private JwtFilter jwtFilter;
 
+    // Configures the authentication provider with user details and password
+    // encoding
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 
+        // Sets the service to load user details
         provider.setUserDetailsService(userDetailsService);
+        // Uses BCrypt hashing for passwords with strength 12
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
 
         return provider;
     }
 
+    // Creates the authentication manager from the auto-configuration
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-
     }
 
+    // Configures security filter chain - main security configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // Disables CSRF protection as we're using JWT
+                .csrf(customizer -> customizer.disable())
 
-        http.csrf(customizer -> customizer.disable())
+                // Configure authorization rules
                 .authorizeHttpRequests(request -> request
-                .requestMatchers("register", "login")
-                .permitAll()
-                 .anyRequest().authenticated())
-                // when session is stateless, then don't need form login.
-                // .formLogin(Customizer.withDefaults())
+                        // Allows public access to register and login endpoints
+                        .requestMatchers("register", "login")
+                        .permitAll()
+                        // All other requests require authentication
+                        .anyRequest().authenticated())
+
+                // Enables HTTP Basic authentication
                 .httpBasic(Customizer.withDefaults())
+
+                // Configures session management to be stateless (for JWT)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // Adds JWT filter before the standard authentication filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//
-//        UserDetails user = User.withDefaultPasswordEncoder()
-//                .username("user")
-//                .password("password")
-//                .roles("USER")
-//                .build();
-//
-//        UserDetails admin = User.withDefaultPasswordEncoder()
-//                .username("admin")
-//                .password("password")
-//                .roles("ADMIN")
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(user, admin);
-//    }
 }
+
+// in-memory user details service
+// This was likely used for testing before implementing actual user service
+// @Bean
+// public UserDetailsService userDetailsService() {
+//
+// UserDetails user = User.withDefaultPasswordEncoder()
+// .username("user")
+// .password("password")
+// .roles("USER")
+// .build();
+//
+// UserDetails admin = User.withDefaultPasswordEncoder()
+// .username("admin")
+// .password("password")
+// .roles("ADMIN")
+// .build();
+//
+// return new InMemoryUserDetailsManager(user, admin);
+// }
