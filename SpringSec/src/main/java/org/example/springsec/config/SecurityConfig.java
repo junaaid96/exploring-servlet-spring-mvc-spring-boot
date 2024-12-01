@@ -22,9 +22,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-// Configuration class for Spring Security settings
 @Configuration
-@EnableWebSecurity // Enables Spring Security's web security support
+@EnableWebSecurity
 public class SecurityConfig {
     // Service to load user-specific data
     @Autowired

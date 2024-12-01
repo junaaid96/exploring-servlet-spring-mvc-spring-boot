@@ -37,21 +37,21 @@ public class JwtFilter extends OncePerRequestFilter {
         // Get the Authorization header from the request
         String authHeader = request.getHeader("Authorization");
         String token = null;
-        String userName = null;
+        String username = null;
 
         // Check if Authorization header exists and starts with "Bearer "
         if(authHeader != null && authHeader.startsWith("Bearer ")){
             // Extract the token (remove "Bearer " prefix)
             token = authHeader.substring(7);
             // Extract username from the token
-            userName = jwtService.extractUsername(token);
+            username = jwtService.extractUsername(token);
         }
 
         // Proceed only if username is extracted and no authentication exists in SecurityContext
-        if(userName != null && SecurityContextHolder.getContext().getAuthentication()==null){
+        if(username != null && SecurityContextHolder.getContext().getAuthentication()==null){
 
             // Load user details from database using username
-            UserDetails userDetails = context.getBean(MyUserDetailsService.class).loadUserByUsername(userName);
+            UserDetails userDetails = context.getBean(MyUserDetailsService.class).loadUserByUsername(username);
 
             // Validate the token against user details
             if(jwtService.validateToken(token, userDetails)){
